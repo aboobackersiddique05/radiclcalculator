@@ -1,23 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:radicalcalc/HomeScreen.dart';
 import 'package:radicalcalc/calculatorcontroller.dart';
+import 'package:radicalcalc/imagepicker.dart';
+import 'package:radicalcalc/provider.dart';
 
+class Login extends StatefulWidget {
+  @override
+  _LoginState createState() => _LoginState();
+}
 
-class Login extends StatelessWidget {
+class _LoginState extends State<Login> {
   final CalculatorController calculatorController = Get.put(CalculatorController());
+  int _currentIndex = 0;
 
-  Widget button(String buttontext) {
+  final List<Widget> _screens = [
+    CalculatorScreen(), 
+    Login(),       
+    UploadImage()       
+  ];
+
+  Widget roundButton(String buttonText) {
     return Expanded(
-      child: OutlinedButton(
-        child: Text(
-          buttontext,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-        ),
-        onPressed: () {
-          calculatorController.operations(buttontext);
-        },
-      ),
-    );
+      child: Container(
+        margin: EdgeInsets.all(8.0),
+        child: ClipOval(
+          child: Material(
+            color: Colors.orange,
+            child: InkWell(
+              onTap: () {
+                calculatorController.operations(buttonText);
+              },
+              child: SizedBox(
+                width: 70,
+                height: 60,
+                child: Center(
+                  child: Text(
+                    buttonText,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.white,
+                       ),
+                            ),
+                      ),
+                    ),
+                    ),
+                  ),
+                  ),
+                 ),
+                     );
   }
 
   @override
@@ -27,60 +59,35 @@ class Login extends StatelessWidget {
         title: Text('Calculator'),
         backgroundColor: Colors.blue,
       ),
-      body: Column(
-        children: [
-          
-          Container(
-            alignment: Alignment.centerRight,
-            padding: EdgeInsets.symmetric(vertical: 24.0, horizontal: 12.0),
-            child: Obx(() => Text(
-              calculatorController.output.value,
-              style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
-            )),
+      body: PageView(
+        controller: PageController(initialPage: _currentIndex),
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        children: _screens,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (int newIndex) {
+          setState(() {
+            _currentIndex = newIndex;
+          });
+        },
+        items: [
+          BottomNavigationBarItem(
+            label: 'Provider',
+            icon: Icon(Icons.calculate),
           ),
-          const Expanded(child: Divider()),
-          Column(
-            children: [
-              Row(
-                children: [
-                  button('7'),
-                  button('8'),
-                  button('9'),
-                  button('/')
-                ],
-              ),
-              Row(
-                children: [
-                  button('4'),
-                  button('5'),
-                  button('6'),
-                  button('*')
-                ],
-              ),
-              Row(
-                children: [
-                  button('1'),
-                  button('2'),
-                  button('3'),
-                  button('-')
-                ],
-              ),
-              Row(
-                children: [
-                  button('.'),
-                  button('0'),
-                  button('00'),
-                  button('+')
-                ],
-              ),
-              Row(
-                children: [
-                  button('CLEAR'),
-                  button('='),
-                ],
-              )
-            ],
-          )
+          BottomNavigationBarItem(
+            label: 'Getx',
+            icon: Icon(Icons.home),
+          ),
+          BottomNavigationBarItem(
+            label: 'Upload',
+            icon: Icon(Icons.upload),
+          ),
         ],
       ),
     );
